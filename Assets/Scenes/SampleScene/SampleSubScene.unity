@@ -201,7 +201,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _initialState: 0
-  _hudController: {fileID: 0}
 --- !u!4 &1034389712
 Transform:
   m_ObjectHideFlags: 0
