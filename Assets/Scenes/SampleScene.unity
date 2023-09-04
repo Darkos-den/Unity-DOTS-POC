@@ -1004,6 +1004,7 @@ MonoBehaviour:
   _playerImage: {fileID: 1593841247}
   _player1: {fileID: -774123461, guid: 30b0cca05b33ba44382d46726cda7dbe, type: 3}
   _player2: {fileID: -1987403741, guid: 30b0cca05b33ba44382d46726cda7dbe, type: 3}
+  _turn: {fileID: 11400000, guid: 2830afb91738cce42947cc4330ff4bb2, type: 2}
 --- !u!1 &993025125
 GameObject:
   m_ObjectHideFlags: 0
@@ -1279,6 +1280,8 @@ GameObject:
   - component: {fileID: 1171870650}
   - component: {fileID: 1171870649}
   - component: {fileID: 1171870648}
+  - component: {fileID: 1171870654}
+  - component: {fileID: 1171870653}
   m_Layer: 5
   m_Name: Pause HUD
   m_TagString: Untagged
@@ -1383,6 +1386,62 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 0}
+--- !u!114 &1171870653
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1171870647}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d97d29baf9cdc8b4cb8e7143df399fe6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Event: {fileID: 11400000, guid: a2035d93075297e42b5c4ba1021200dc, type: 2}
+  Response:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 1171870648}
+        m_TargetAssemblyTypeName: PauseHudController, Assembly-CSharp
+        m_MethodName: OnDraw
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+--- !u!114 &1171870654
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1171870647}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d97d29baf9cdc8b4cb8e7143df399fe6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Event: {fileID: 11400000, guid: 901b6fa7eb8619e4d83c1d337643266b, type: 2}
+  Response:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 1171870648}
+        m_TargetAssemblyTypeName: PauseHudController, Assembly-CSharp
+        m_MethodName: OnUserWin
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!1 &1177126949
 GameObject:
   m_ObjectHideFlags: 0

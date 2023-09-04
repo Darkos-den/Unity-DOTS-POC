@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using Unity.Entities;
 using UnityEngine;
 
-public class TurnHudComponent : IComponentData {
-    
-    public TurnVariable State;
+public struct CellComponent : IComponentData, IEnableableComponent {
+
+    public TurnState State;
 }

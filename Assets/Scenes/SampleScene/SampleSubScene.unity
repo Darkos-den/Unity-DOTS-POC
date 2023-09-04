@@ -201,6 +201,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _initialState: 0
+  _variable: {fileID: 11400000, guid: 2830afb91738cce42947cc4330ff4bb2, type: 2}
+  _onDraw: {fileID: 11400000, guid: a2035d93075297e42b5c4ba1021200dc, type: 2}
+  _onUserWin: {fileID: 11400000, guid: 901b6fa7eb8619e4d83c1d337643266b, type: 2}
 --- !u!4 &1034389712
 Transform:
   m_ObjectHideFlags: 0

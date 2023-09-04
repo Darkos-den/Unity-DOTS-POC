@@ -1,7 +1,7 @@
 using Unity.Entities;
 using UnityEngine;
 
-[UpdateAfter(typeof(ApplyUserChoiceSystem))]
+[UpdateAfter(typeof(MouseInputSystem))]
 public partial struct CellRenderSystem : ISystem {
 
     public void OnCreate(ref SystemState state) {
@@ -10,38 +10,29 @@ public partial struct CellRenderSystem : ISystem {
     public void OnDestroy(ref SystemState state) { }
 
     public void OnUpdate(ref SystemState state) {
-
         var turn = SystemAPI.GetSingleton<TurnComponent>();
         var sprites = SystemAPI.ManagedAPI.GetSingleton<SpritesComponent>();
 
-        var mouseover = SystemAPI.GetSingleton<MouseOverComponent>();
+        foreach ((var _, var entity) in SystemAPI.Query<HighlightTag>().WithDisabled<HighlightComponent>().WithAll<SelectableComponent>().WithEntityAccess()) {
+            var spriteRenderer = SystemAPI.ManagedAPI.GetComponent<SpriteRenderer>(entity);
+            spriteRenderer.sprite = sprites.SelectSprite(turn.State);
 
-        foreach ((var _, var entity) in SystemAPI.Query<PositionComponent>().WithEntityAccess()) {
-            var item = SystemAPI.GetAspect<BoardItemAspect>(entity);
-
-            var spriteRenderer = SystemAPI.ManagedAPI.GetComponent<SpriteRenderer>(item.Self);
-      
-            if(item.IsSelected) {
-                spriteRenderer.color = Color.white;
-                spriteRenderer.sprite = sprites.SelectSprite(item.Cell);
-            } else {
-                spriteRenderer.color = Color.white;
-                spriteRenderer.sprite = sprites.Empty;
-            }
+            SystemAPI.SetComponentEnabled<HighlightComponent>(entity, true);
         }
 
-        if (mouseover.Valid) {
-            if(SystemAPI.HasComponent<PositionComponent>(mouseover.PrevTarget)) {
-                var sr = SystemAPI.ManagedAPI.GetComponent<SpriteRenderer>(mouseover.PrevTarget);
-                sr.sprite = sprites.Empty;
-            }
+        foreach ((var _, var entity) in SystemAPI.Query<HighlightComponent>().WithDisabled<HighlightTag>().WithAll<SelectableComponent>().WithEntityAccess()) {
+            var spriteRenderer = SystemAPI.ManagedAPI.GetComponent<SpriteRenderer>(entity);
+            spriteRenderer.sprite = sprites.Empty;
 
-            var spriteRenderer = SystemAPI.ManagedAPI.GetComponent<SpriteRenderer>(mouseover.Target);
-            var color = Color.white;
-            color.a = 0.5f;
+            SystemAPI.SetComponentEnabled<HighlightComponent>(entity, false);
+        }
 
-            spriteRenderer.color = color;
-            spriteRenderer.sprite = sprites.SelectSprite(turn.State);
+        foreach ((var _, var entity) in SystemAPI.Query<CellTag>().WithDisabled<CellComponent>().WithEntityAccess()) {
+            var cell = SystemAPI.GetComponent<CellComponent>(entity);
+            var spriteRenderer = SystemAPI.ManagedAPI.GetComponent<SpriteRenderer>(entity);
+            spriteRenderer.sprite = sprites.SelectSprite(cell.State);
+
+            SystemAPI.SetComponentEnabled<CellComponent>(entity, true);
         }
     }
 

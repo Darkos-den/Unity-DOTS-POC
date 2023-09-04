@@ -1,13 +1,9 @@
-using System;
 using System.Collections.Generic;
 using Unity.Entities;
 using UnityEngine;
 
-[UpdateAfter(typeof(ApplyUserChoiceSystem))]
+[UpdateAfter(typeof(CellRenderSystem))]
 public partial class WinCheckSystem : SystemBase {
-
-    public Action<TurnState> OnUserWin;
-    public Action OnDraw;
 
     protected override void OnUpdate() {
 
@@ -18,11 +14,9 @@ public partial class WinCheckSystem : SystemBase {
 
             int total = 0;
 
-            foreach ((var _, var entity) in SystemAPI.Query<PositionComponent>().WithDisabled<SelectableComponent>().WithEntityAccess()) {
-                var item = SystemAPI.GetAspect<BoardItemAspect>(entity);
-
-                if (item.Cell == turn) {
-                    indexs.Add(item.Position.Y * 3 + item.Position.X);
+            foreach ((var position, var cell) in SystemAPI.Query<PositionComponent, CellComponent>()) {
+                if (cell.State == turn) {
+                    indexs.Add(position.Y * 3 + position.X);
                 }
                 total++;
             }
@@ -36,18 +30,20 @@ public partial class WinCheckSystem : SystemBase {
             var diagonales = (indexs.Contains(0) && indexs.Contains(4) && indexs.Contains(8)) ||
                 (indexs.Contains(2) && indexs.Contains(4) && indexs.Contains(6));
 
+            var events = SystemAPI.ManagedAPI.GetSingleton<GameEventComponent>();
+
             if (horizontales || verticales || diagonales) {
-                OnUserWin?.Invoke(turn);
+                events.OnUserWin.Invoke();
                 RemoveSelectables();
             } else if (total == 9) {
-                OnDraw?.Invoke();
+                events.OnDraw.Invoke();
             }
         }
     }
 
     private void RemoveSelectables() {
-        foreach (var item in SystemAPI.Query<BoardItemAspect>()) {
-            item.IsSelectable = false;
+        foreach (var item in SystemAPI.Query<EnabledRefRW<SelectableComponent>>()) {
+            item.ValueRW = false;
         }
     }
 }

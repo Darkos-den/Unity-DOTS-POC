@@ -1,3 +1,4 @@
+using System;
 using Unity.Burst;
 using Unity.Collections;
 using Unity.Entities;
@@ -50,24 +51,40 @@ public partial struct InitializeBoardSystem : ISystem {
             var ecb = ECB;
             Entity newEntity = ecb.Instantiate(index, Prefab);
 
-            var position = new PositionComponent {
-                X = index / 3,
-                Y = (index + 1) % 3,
-            };
-            var cell = new CellComponent { State = TurnState.Player1, Valid = false };
-            var transform = LocalTransform.FromPosition(
-                new float3(
-                    position.X * 1.25f,
-                    position.Y * 1.25f,
-                    -2f
-                )
-           );
+            var position = ProcessPosition(index);
+            var cell = new CellComponent { State = TurnState.Player1 };
+            var transform = ProcessTransform(position);
 
             ecb.AddComponent(index, newEntity, position);
             ecb.AddComponent(index, newEntity, cell);
             ecb.SetComponent(index, newEntity, transform);
 
             ecb.AddComponent<SelectableComponent>(index, newEntity);
+            ecb.AddComponent<HighlightComponent>(index, newEntity);
+            ecb.AddComponent<HighlightTag>(index, newEntity);
+            ecb.AddComponent<CellTag>(index, newEntity);
+
+            ecb.SetComponentEnabled<HighlightComponent>(index, newEntity, false);
+            ecb.SetComponentEnabled<HighlightTag>(index, newEntity, false);
+            ecb.SetComponentEnabled<CellComponent>(index, newEntity, false);
+            ecb.SetComponentEnabled<CellTag>(index, newEntity, false);
+        }
+
+        private PositionComponent ProcessPosition(int index) {
+            return new PositionComponent {
+                X = index / 3,
+                Y = (index + 1) % 3,
+            };
+        }
+
+        private LocalTransform ProcessTransform(PositionComponent position) {
+            return LocalTransform.FromPosition(
+                new float3(
+                    position.X * 1.25f,
+                    position.Y * 1.25f,
+                    -2f
+                )
+           );
         }
     }
 }

@@ -7,32 +7,22 @@ using UnityEngine;
 
 public class PauseHudController : MonoBehaviour
 {
-    [SerializeField]
-    private TextMeshProUGUI _text;
-
-    [SerializeField]
-    private GameObject _hud;
+    [SerializeField] private TextMeshProUGUI _text;
+    [SerializeField] private GameObject _hud;
 
     private void OnEnable() {
-        var system = World.DefaultGameObjectInjectionWorld.GetExistingSystemManaged<WinCheckSystem>();
-        system.OnUserWin += OnUserWin;
-        system.OnDraw += OnDraw;
     }
 
     private void OnDisable() {
-        if (World.DefaultGameObjectInjectionWorld == null) return;
-        var system = World.DefaultGameObjectInjectionWorld.GetExistingSystemManaged<WinCheckSystem>();
-        system.OnUserWin -= OnUserWin;
-        system.OnDraw -= OnDraw;
     }
 
-    private void OnUserWin(TurnState state) {
+    public void OnUserWin() {
         _hud.SetActive(true);
 
         _text.text = "You WIN";
     }
 
-    private void OnDraw() {
+    public void OnDraw() {
         _hud.SetActive(true);
 
         _text.text = "DRAW";

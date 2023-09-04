@@ -3,8 +3,4 @@ using System.Collections.Generic;
 using Unity.Entities;
 using UnityEngine;
 
-public struct CellComponent : IComponentData {
-
-    public TurnState State;
-    public bool Valid;
-}
+public struct HighlightTag : IComponentData, IEnableableComponent{}
