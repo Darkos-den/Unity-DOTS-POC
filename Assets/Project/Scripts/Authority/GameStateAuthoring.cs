@@ -22,7 +22,6 @@ public class GameStateAuthoring : MonoBehaviour {
             authoring._variable.state = authoring._initialState;
 
             AddComponent(entity, new TurnComponent { State = authoring._initialState });
-            AddComponent(entity, new MouseOverComponent { Target = entity, Valid = false, PrevTarget = entity });
             AddComponentObject(entity, new TurnHudComponent { State = authoring._variable });
             AddComponentObject(entity, new GameEventComponent { OnDraw = authoring._onDraw, OnUserWin = authoring._onUserWin });
         }
