@@ -1,4 +1,3 @@
-using Unity.Entities;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -34,7 +33,6 @@ public class HudController : MonoBehaviour {
             return;
         }
         _currentState = state;
-        Debug.Log(">> " + state);
         if (state == TurnState.Player1) {
             _playerImage.sprite = _player1;
         } else {

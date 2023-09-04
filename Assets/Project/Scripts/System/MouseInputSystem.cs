@@ -1,4 +1,5 @@
 using Unity.Burst;
+using Unity.Collections;
 using Unity.Entities;
 using Unity.Jobs;
 using UnityEngine;
@@ -23,31 +24,24 @@ public partial class MouseInputSystem : SystemBase {
     protected override void OnUpdate() {
         var position = MainCamera.ScreenToWorldPoint(Input.mousePosition);
 
-        var stub = new StubJob { };
-        var job = new CheckMousePositionJob { Position = position };
-        var handle = job.ScheduleParallel(stub.Schedule());
-        handle.Complete();
+        var result = new NativeArray<bool>(1, Allocator.TempJob);
+        var turn = SystemAPI.GetSingletonRW<TurnComponent>();
 
-        if (Input.GetMouseButtonDown(0)) {
-            CheckClickEvent();
-        }
-    }
+        var isClick = Input.GetMouseButtonDown(0);
+        result[0] = false;
+        var job = new CheckMousePositionJob { 
+            Position = position, 
+            IsClick = isClick,
+            TurnState = turn.ValueRO.State,
+            Result = result,
+        };
+        job.ScheduleParallel(new StubJob().Schedule()).Complete();
 
-    private void CheckClickEvent() {
-        foreach ((var _, var entity) in SystemAPI.Query<HighlightTag>().WithEntityAccess()) {
-
-            var cell = SystemAPI.GetComponentRW<CellComponent>(entity);
-            var turn = SystemAPI.GetSingletonRW<TurnComponent>();
-            var hud = SystemAPI.ManagedAPI.GetSingleton<TurnHudComponent>().State;
-
-            cell.ValueRW.State = turn.ValueRO.State;
+        if (result[0]) {
             turn.ValueRW.State = turn.ValueRO.Invert();
-            hud.state = turn.ValueRO.State;
 
-            SystemAPI.SetComponentEnabled<HighlightTag>(entity, false);
-            SystemAPI.SetComponentEnabled<SelectableComponent>(entity, false);
-            SystemAPI.SetComponentEnabled<CellTag>(entity, true);
-            break;
+            var hud = SystemAPI.ManagedAPI.GetSingleton<TurnHudComponent>().State;
+            hud.state = turn.ValueRO.State;
         }
     }
 
@@ -64,10 +58,29 @@ public partial class MouseInputSystem : SystemBase {
     public partial struct CheckMousePositionJob : IJobEntity {
 
         public Vector3 Position;
+        public bool IsClick;
+        public TurnState TurnState;
 
-        public void Execute(BoardItemAspect item, EnabledRefRO<HighlightComponent> component, EnabledRefRW<HighlightTag> tag) {
+        public NativeArray<bool> Result;
+
+        public void Execute(
+            BoardItemAspect item, 
+            EnabledRefRO<HighlightComponent> component, 
+            EnabledRefRW<HighlightTag> tag,
+            EnabledRefRW<SelectableComponent> selectable,
+            RefRW<CellComponent> cell,
+            EnabledRefRW<CellTag> cellTag,
+            [EntityIndexInQuery] int sortKey
+        ) {
             if (item.Bounds.Contains(Position)) {
-                if (!component.ValueRO) {
+                if (IsClick) {
+                    cell.ValueRW.State = TurnState;
+                    Result[0] = true;
+
+                    tag.ValueRW = false;
+                    selectable.ValueRW = false;
+                    cellTag.ValueRW = true;
+                } else if (!component.ValueRO) {
                     tag.ValueRW = true;
                 }
             } else {
